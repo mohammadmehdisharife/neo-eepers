@@ -274,13 +274,7 @@ procedure Eepers is
     type Eyes_Mesh is array (Eye) of Eye_Mesh;
     Eyes_Meshes: constant array (Eyes_Kind) of Eyes_Mesh := (
         Eyes_Open => (
-            -- 1-3
-            -- |/|
-            -- 2-4
             Left_Eye => ( (0.0, 0.0), (0.0, 1.0), (1.0, 0.0), (1.0, 1.0) ),
-            -- 3-4
-            -- |\|
-            -- 1-2
             Right_Eye => ( (0.0, 1.0), (1.0, 1.0), (0.0, 0.0), (1.0, 0.0) )
         ),
         Eyes_Closed => (
@@ -471,8 +465,6 @@ procedure Eepers is
                 if not Within_Map(Game, (X, Y)) then
                     return False;
                 end if;
-                -- NOTE: it's fine to step into the explosions, because they don't live long enough.
-                -- They disappear on the next turn.
                 if Game.Map(Y, X) /= Cell_Floor and Game.Map(Y, X) /= Cell_Explosion then
                     return False;
                 end if;
@@ -807,9 +799,6 @@ procedure Eepers is
                                     Game.Player.Prev_Position := (Column, Row);
                                     Game.Player.Bombs := 0;
                                     Game.Player.Keys := 0;
-                                    -- TODO: should we save the state of the eyes in the checkpoint?
-                                    --   Or maybe checkpoint should just save the entirety of the Player_State.
-                                    --   'Cause that's what we do for Eepers anyway. It works for them.
                                     Game.Player.Prev_Eyes := Eyes_Closed;
                                     Game.Player.Eyes := Eyes_Open;
                                     Game.Player.Eyes_Angle := Pi*0.5;
@@ -1036,10 +1025,6 @@ procedure Eepers is
     begin
         Game.Camera.offset := Camera_Offset;
         Game.Camera.target := Game.Camera.target + Camera_Velocity*Get_Frame_Time;
-        --  TODO: animate zoom similarly to Game.Camera.target
-        --    So it looks cool when you resize the game in the window mode.
-        --  TODO: The tutorial signs look gross on bigger screens.
-        --    We need to do something with the fonts
         Game.Camera.zoom := C_Float'Max(Screen_Size.x/1920.0, Screen_Size.y/1080.0);
     end;
 
@@ -1467,10 +1452,6 @@ procedure Eepers is
                                 Game_Explosions_Turn(Game);
                                 Game_Items_Turn(Game);
 
-                                --  Game_Player_Turn(Game, Action_Plant_Bomb, Left);
-                                Game.Player.Prev_Eyes := Game.Player.Eyes;
-                                Game.Player.Prev_Position := Game.Player.Position;
-
                                 Game_Bombs_Turn(Game);
                                 Game_Eepers_Turn(Game);
 
@@ -1627,18 +1608,18 @@ begin
         Footsteps_Sounds(Index) := Load_Sound(To_C("assets/sounds/footsteps.mp3"));
         Set_Sound_Pitch(Footsteps_Sounds(Index), Footsteps_Pitches(Index));
     end loop;
-    Blast_Sound := Load_Sound(To_C("assets/sounds/blast.ogg"));             -- https://opengameart.org/content/magic-sfx-sample
-    Key_Pickup_Sound := Load_Sound(To_C("assets/sounds/key-pickup.wav"));   -- https://opengameart.org/content/beep-tone-sound-sfx
-    Ambient_Music := Load_Music_Stream(To_C("assets/sounds/ambient.wav"));  -- https://opengameart.org/content/ambient-soundtrack
+    Blast_Sound := Load_Sound(To_C("assets/sounds/blast.ogg"));
+    Key_Pickup_Sound := Load_Sound(To_C("assets/sounds/key-pickup.wav"));
+    Ambient_Music := Load_Music_Stream(To_C("assets/sounds/ambient.wav"));
     Set_Music_Volume(Ambient_Music, 0.5);
-    Bomb_Pickup_Sound := Load_Sound(To_C("assets/sounds/bomb-pickup.ogg")); -- https://opengameart.org/content/pickupplastic-sound
-    Open_Door_Sound := Load_Sound(To_C("assets/sounds/open-door.wav"));     -- https://opengameart.org/content/picked-coin-echo
+    Bomb_Pickup_Sound := Load_Sound(To_C("assets/sounds/bomb-pickup.ogg"));
+    Open_Door_Sound := Load_Sound(To_C("assets/sounds/open-door.wav"));
     Set_Sound_Volume(Open_Door_Sound, 0.5);
-    Checkpoint_Sound := Load_Sound(To_C("assets/sounds/checkpoint.ogg"));   -- https://opengameart.org/content/level-up-power-up-coin-get-13-sounds
+    Checkpoint_Sound := Load_Sound(To_C("assets/sounds/checkpoint.ogg"));
     Set_Sound_Pitch(Checkpoint_Sound, 0.8);
-    Guard_Step_Sound := Load_Sound(To_C("assets/sounds/guard-step.ogg"));   -- https://opengameart.org/content/fire-whip-hit-yo-frankie
-    Plant_Bomb_Sound := Load_Sound(To_C("assets/sounds/plant-bomb.wav"));   -- https://opengameart.org/content/ui-soundpack-by-m1chiboi-bleeps-and-clicks
-    Popup_Show_Sound := Load_Sound(To_C("assets/sounds/popup-show.wav"));   -- https://opengameart.org/content/ui-soundpack-by-m1chiboi-bleeps-and-clicks
+    Guard_Step_Sound := Load_Sound(To_C("assets/sounds/guard-step.ogg"));
+    Plant_Bomb_Sound := Load_Sound(To_C("assets/sounds/plant-bomb.wav"));
+    Popup_Show_Sound := Load_Sound(To_C("assets/sounds/popup-show.wav"));
     Tutorial_Font := Load_Font_Ex(To_C("assets/fonts/Vollkorn/static/Vollkorn-Regular.ttf"), Tutorial_Font_Size, 0, 0);
     Gen_Texture_Mipmaps(Tutorial_Font.Texture'Access);
     Death_Font := Load_Font_Ex(To_C("assets/fonts/Vollkorn/static/Vollkorn-Regular.ttf"), Death_Font_Size, 0, 0);
