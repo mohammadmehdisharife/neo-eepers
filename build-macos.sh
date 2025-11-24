@@ -30,4 +30,4 @@ echo '<?xml version="1.0" encoding="UTF-8"?>
   <key>CFBundleIconFile</key>
   <string>icon.ico</string>
 </dict>
-</plist>' > eepers.app/Contents/Info.plist
+</plist>' >eepers.app/Contents/Info.plist
